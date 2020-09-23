@@ -1,135 +1,94 @@
-var controllerOptions = {};
+oneFrameOfData = nj.array([[[ 409.66615, 553.63318,   94.8544, 409.66615, 553.63318,   94.8544],
+        [ 409.66615, 553.63318,   94.8544, 467.19802, 444.07265,   57.6579],
+        [ 467.19802, 444.07265,   57.6579, 491.27857, 389.07001,     30.41],
+        [ 491.27857, 389.07001,     30.41, 536.28222, 315.49342,   16.7986]],
+       [[ 358.15822, 432.04306,   93.2081, 370.11728, 305.24291,   33.4973],
+        [ 370.11728, 305.24291,   33.4973, 377.20621, 210.66194,  -0.52484],
+        [ 377.20621, 210.66194,  -0.52484,  387.0877, 198.08815,  -20.6944],
+        [  387.0877, 198.08815,  -20.6944, 397.11423, 213.34058,  -34.7591]],
+       [[ 314.65607, 439.23646,    91.951, 293.01823, 335.26215,   34.9515],
+        [ 293.01823, 335.26215,   34.9515, 273.84005, 228.98691,  -2.98854],
+        [ 273.84005, 228.98691,  -2.98854, 274.14623, 210.93251,  -26.8379],
+        [ 274.14623, 210.93251,  -26.8379, 280.73814, 224.27867,  -42.5026]],
+       [[ 273.50757, 466.56936,   91.2673, 222.13195, 392.55493,   40.7928],
+        [ 222.13195, 392.55493,   40.7928, 185.06097, 308.70317,   5.82146],
+        [ 185.06097, 308.70317,   5.82146, 173.51497, 293.08767,  -17.2759],
+        [ 173.51497, 293.08767,  -17.2759,  172.4607, 303.34358,  -32.9632]],
+       [[ 241.23252, 538.01537,   91.1066, 164.81962, 473.72729,   46.4563],
+        [ 164.81962, 473.72729,   46.4563,  94.39347, 431.46648,   22.3296],
+        [  94.39347, 431.46648,   22.3296,  62.28466, 424.46657,   7.71669],
+        [  62.28466, 424.46657,   7.71669,  39.78297, 430.61857,  -5.78197]]])
+
+anotherFrameOfData = nj.array([[[ 383.69345, 614.85424,   61.1003, 383.69345, 614.85424,   61.1003],
+        [ 383.69345, 614.85424,   61.1003, 475.99993, 483.80421,   33.6008],
+        [ 475.99993, 483.80421,   33.6008, 516.72519, 405.82899,   11.5515],
+        [ 516.72519, 405.82899,   11.5515, 559.62156, 344.55641,  -1.41085]],
+       [[ 349.57613, 481.89334,    61.245, 354.65956, 344.63032,   8.78787],
+        [ 354.65956, 344.63032,   8.78787, 365.40122, 202.49364,  -18.2171],
+        [ 365.40122, 202.49364,  -18.2171, 371.71281, 175.49843,  -35.9567],
+        [ 371.71281, 175.49843,  -35.9567, 375.80608, 191.38236,  -48.5681]],
+       [[ 306.72004, 470.60715,   61.0325, 277.88277, 342.06744,   11.5912],
+        [ 277.88277, 342.06744,   11.5912, 252.90027, 196.22646,  -19.3601],
+        [ 252.90027, 196.22646,  -19.3601, 244.71091, 172.40672,   -40.374],
+        [ 244.71091, 172.40672,   -40.374, 243.66619, 193.94935,  -54.1912]],
+       [[ 263.74118, 479.00692,    61.193, 205.18795,  368.9173,   18.0236],
+        [ 205.18795,  368.9173,   18.0236, 159.25744, 250.86725,   -10.549],
+        [ 159.25744, 250.86725,   -10.549, 139.60533, 235.16972,  -30.7685],
+        [ 139.60533, 235.16972,  -30.7685, 132.80877, 258.57477,  -44.3834]],
+       [[ 223.75913,  531.6966,   61.4446, 142.29921, 423.04486,   23.9114],
+        [ 142.29921, 423.04486,   23.9114,  63.54399, 351.80408,   5.34045],
+        [  63.54399, 351.80408,   5.34045,  30.04804, 351.50271,  -7.45061],
+        [  30.04804, 351.50271,  -7.45061,  11.70782, 380.59848,  -19.2274]]])
 
 
-rawXMin = 100;
-rawXMax = 10;
-rawYMin = 100;
-rawYMax = 10;
+var frameIndex = 0;
+var flip = 0;
 
-function HandleFrame(frame) {
-	if (frame.hands.length < 2 && frame.hands.length > 0) {
-		var hand = frame.hands[0];
-		HandleHand(hand);
+function draw() {
+    clear();
+
+    for (var i = 0; i < oneFrameOfData.shape[0]; i++) {
+	for (var j = 0; j < oneFrameOfData.shape[1]; j++) {
+
+	    if (flip % 2 == 0) {
+
+		var xStart = anotherFrameOfData.get(i,j,0);
+		var yStart = anotherFrameOfData.get(i,j,1);
+		var zStart = anotherFrameOfData.get(i,j,2);
+		var xEnd = anotherFrameOfData.get(i,j,3);
+		var yEnd = anotherFrameOfData.get(i,j,4);
+		var zEnd = anotherFrameOfData.get(i,j,5);
+	    
+		line(xStart, yStart, xEnd, yEnd);
+		
+	    }
+	    else {
+		
+		var xStart = oneFrameOfData.get(i,j,0);
+		var yStart = oneFrameOfData.get(i,j,1);
+		var zStart = oneFrameOfData.get(i,j,2);
+		var xEnd = oneFrameOfData.get(i,j,3);
+		var yEnd = oneFrameOfData.get(i,j,4);
+		var zEnd = oneFrameOfData.get(i,j,5);
+		
+		line(xStart, yStart, xEnd, yEnd);
+	    };
 	};
-	
-};
+    };
 
-function HandleHand(hand) {
-    var fingers = hand.fingers;
 
-    var i;
-    var j;
-  
-    for (i = 0; i < 4; i++) {
-	for (j = 0; j < 5; j++) {
-	    finger = hand.fingers[j];
-	    bone = finger.bones[i];
-	    HandleBone(bone, bone.type);
+
+    frameIndex++;
+    if (frameIndex == 100) {
+	frameIndex = 0;
+	if (flip == 0) {
+	    flip = 1;
+	} else if (flip == 1) {
+	    flip = 0;
 	};
     };
 
-    
+    console.log(flip);
 
-
-    
-    
-    //hand.fingers.forEach(function(finger) {
-	//finger.bones.forEach(function(bone) {
-	   // HandleBone(bone, bone.type);
-	//});
-    //});
-			   
-};
-
-function HandleFinger(finger) {
-	
-	tip = finger.tipPosition;
-	x = tip[0];
-	y = tip[1];
-	z = tip[2];
-
-	var bones = finger.bones;
-	finger.bones.forEach(function(bone) {
-	    HandleBone(bone, bone.type);
-	});
-
-};
-
-function HandleBone(bone, type) {
-    
-    tip = bone.nextJoint;
-    xt = tip[0];
-    yt = tip[1];
-    zt = tip[2];
-
-    base = bone.prevJoint;
-    xb = base[0];
-    yb = base[1];
-    zb = base[2];
-
-    //get bone tip coordinates
-    [xt,yt] = TransformCoordinates(xt,yt);
-
-    //get bone base coordinates
-    [xb,yb] = TransformCoordinates(xb,yb);
-
-    if (type == 0) {
-	strokeWeight(4);
-	stroke([192]);
-    };
-
-    if (type == 1) {
-	strokeWeight(3);
-	stroke([129]);
-    };
-
-    if (type == 2) {
-	strokeWeight(2);
-	stroke([66]);
-    };
-
-    if (type == 3) {
-	strokeWeight(1);
-	stroke([0]);
-    };
-
-    line(xt, yt, xb, yb)
     
 };
-
-function TransformCoordinates(x,y) {
-
-    if (x < rawXMin) {
-	rawXMin = x;	
-    };
-
-    if (x > rawXMax) {
-	rawXMax = x;
-    };
-
-    if (y < rawYMax) {
-	rawYMax = y;
-    };
-
-    if (y > rawYMin) {
-	rawYMin = y;
-    };
-
-    OldRangeX = (rawXMax - rawXMin);
-    NewRangeX = (window.innerWidth - 0); 		
-    NewValueX = (((x - rawXMin) * NewRangeX) / OldRangeX) + 0;
-
-    OldRangeY = (rawYMax - rawYMin);
-    NewRangeY = (window.innerHeight - 0);
-    NewValueY = (((y - rawYMin) * NewRangeY) / OldRangeY) + 0;
-
-    return [NewValueX,NewValueY];
-
-};
-
-Leap.loop(controllerOptions, function(frame) {
-	clear();
-	HandleFrame(frame);
-});
-
-
