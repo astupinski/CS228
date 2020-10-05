@@ -197,6 +197,7 @@ function Test() {
 
 
 function DrawCircles() {
+    console.log(predictedClassLabels.toString());
     for (j = 0; j<numSamples; j++) {
 	
 	x = irisData.pick(j,null).get(0)*100;
@@ -216,9 +217,9 @@ function DrawCircles() {
 	if (j%2 == 0) {
 	    stroke("black");
 	} else {
-	    if (predictedClassLabels[j] == 0) {
+	    if (predictedClassLabels.get(j) == 0) {
 		stroke("Tomato");
-	    } else if (predictedClassLabels[j] == 1) {
+	    } else if (predictedClassLabels.get(j) == 1) {
 		stroke("DeepSkyBlue");
 	    } else {
 		stroke("SpringGreen");
