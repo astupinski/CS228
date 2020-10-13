@@ -9,9 +9,10 @@ rawYMax = 10;
 previousNumHands = 0;
 currentNumHands = 0;
 
-var numSamples = 2;
+var numSamples = 100;
 var framesOfData = nj.zeros([5,4,6, numSamples]);
 var currentSample = 0;
+var currentSampleNum = 0;
 
 
 function HandleFrame(frame) {
@@ -29,6 +30,7 @@ function HandleHand(hand, hand_num, ibox) {
 
     var i;
     var j;
+	
   
     for (i = 0; i < 4; i++) {
 	for (j = 0; j < 5; j++) {
@@ -36,7 +38,12 @@ function HandleHand(hand, hand_num, ibox) {
 	    bone = finger.bones[i];
 	    HandleBone(bone, bone.type, hand_num, j, i, ibox);
 	};
-    };			   
+    };
+
+    if (previousNumHands == 2 && currentNumHands == 1) {
+
+	console.log(framesOfData.toString());
+    };
 };
 
 function HandleFinger(finger) {
@@ -68,21 +75,18 @@ function HandleBone(bone, type, hand_num, fingerIndex, boneIndex, ibox) {
     yb = base[1];
     zb = base[2];
 
-     if (previousNumHands == 2 && currentNumHands == 1) {
+
 	// background("black");
-	 framesOfData.set(fingerIndex,boneIndex,0,currentSample,xb);
-	 framesOfData.set(fingerIndex,boneIndex,1,currentSample,yb);
-	 framesOfData.set(fingerIndex,boneIndex,2,currentSample,zb);
+    framesOfData.set(fingerIndex,boneIndex,0,currentSample,xb);
+    framesOfData.set(fingerIndex,boneIndex,1,currentSample,yb);
+    framesOfData.set(fingerIndex,boneIndex,2,currentSample,zb);
 
-	 framesOfData.set(fingerIndex,boneIndex,3,currentSample,xt);
-	 framesOfData.set(fingerIndex,boneIndex,4,currentSample,yt);
-	 framesOfData.set(fingerIndex,boneIndex,5,currentSample,zt);
+    framesOfData.set(fingerIndex,boneIndex,3,currentSample,xt);
+    framesOfData.set(fingerIndex,boneIndex,4,currentSample,yt);
+    framesOfData.set(fingerIndex,boneIndex,5,currentSample,zt);
 
-	 console.log(framesOfData.toString());
-    };
+ 
 
-    
-    
 
     //convert the normalized coordinates to span the canvas
     var canvasXprev = window.innerWidth * normalizedPrevJoint[0];
@@ -146,16 +150,12 @@ function HandleBone(bone, type, hand_num, fingerIndex, boneIndex, ibox) {
 function RecordData() {
    
 
-    if (currentNumHands == 2) {
+    if (currentNumHands == 1) {
 
 	currentSample++;
 	if (currentSample == numSamples) {
 	    currentSample = 0;
 	};
-    };
-
-     if (previousNumHands == 2 && currentNumHands == 1) {
-	background("black");
     };
     
 };

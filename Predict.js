@@ -167,8 +167,7 @@ function Train() {
 	if (i%2 == 0) {
 	    currentFeatures = irisData.pick(i,null).slice([0,4]);
 	    currentLabel = irisData.pick(i,null).get(4);
-	    //console.log(i, currentFeatures, currentLabel);
-	    //console.log(currentFeatures.tolist(), currentLabel);
+	    
 	    knnClassifier.addExample(currentFeatures.tolist(),currentLabel);
 	};
     };
@@ -177,7 +176,7 @@ function Train() {
 
 
 function GotResults(err, result) {
-    //console.log(testingSampleIndex,parseInt(result.label));
+   
     predictedClassLabels.set(testingSampleIndex, parseInt(result.label));
     testingSampleIndex = testingSampleIndex + 2;
     if (testingSampleIndex > numSamples) {
@@ -190,9 +189,9 @@ function Test() {
     console.log("I am being tested");
 
     currentFeatures = irisData.pick(testingSampleIndex,null).slice([0,4]);
-    //currentLabel = irisData.pick(testingSampleIndex,null).slice([4,5]);
+    
     knnClassifier.classify(currentFeatures.tolist(), GotResults);
-    //console.log(testingSampleIndex,currentFeatures.toString(),currentLabel.toString());
+    
 };
 
 
@@ -226,9 +225,9 @@ function DrawCircles() {
 	    };
 	};
 	
-	//console.log(j, x, y);
+	
 	circle(x,y,8);
-	//console.log(predictedClassLabels[j]);
+	
     };
 };
 
