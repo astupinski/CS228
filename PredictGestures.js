@@ -11,7 +11,7 @@ var predictedClassLabels = nj.zeros(numSamples);
 var framesOfData = nj.zeros([5,4,6]);
 var numPredictions = 0;
 var mean_acc = 0;
-var d = 5;
+
 
 
 function HandleFrame(frame) {
@@ -153,14 +153,39 @@ function Train() {
     console.log("I am being trained");
 
     for (i = 0; i < train5.shape[3]; i++) {
-	features = train5.pick(null,null,null,i);
-	features1 = train7.pick(null,null,null,i);
+	features5 = train5.pick(null,null,null,i);
+	features7 = train7.pick(null,null,null,i);
+	features1 = train1.pick(null,null,null,i);
+	features0 = train0.pick(null,null,null,i);
+	features2 = train2.pick(null,null,null,i);
+	features3 = train3.pick(null,null,null,i);
+	features4 = train4.pick(null,null,null,i);
+	features6 = train6.pick(null,null,null,i);
+	features8 = train8.pick(null,null,null,i);
+	features9 = train9.pick(null,null,null,i);
 	
-	features = features.reshape(1,120);
+	features5 = features5.reshape(1,120);
+	features7 = features7.reshape(1,120);
 	features1 = features1.reshape(1,120);
+	features0 = features0.reshape(1,120);
+	features2 = features2.reshape(1,120);
+	features3 = features3.reshape(1,120);
+	features4 = features4.reshape(1,120);
+	features6 = features6.reshape(1,120);
+	features8 = features8.reshape(1,120);
+	features9 = features9.reshape(1,120);
 	
-	knnClassifier.addExample(features.tolist(), 5);
-	knnClassifier.addExample(features1.tolist(), 7);
+	
+	knnClassifier.addExample(features5.tolist(), 5);
+	knnClassifier.addExample(features7.tolist(), 7);
+	knnClassifier.addExample(features1.tolist(), 1);
+	knnClassifier.addExample(features0.tolist(), 0);
+	knnClassifier.addExample(features2.tolist(), 2);
+	knnClassifier.addExample(features3.tolist(), 3);
+	knnClassifier.addExample(features4.tolist(), 4);
+	knnClassifier.addExample(features6.tolist(), 6);
+	knnClassifier.addExample(features8.tolist(), 8);
+	knnClassifier.addExample(features9.tolist(), 9);
 
 	
     };
@@ -188,6 +213,7 @@ function GotResults(err, result) {
     //console.log(parseInt(result.label));
     prediction = parseInt(result.label);
     numPredictions++;
+    var d = 9;
     mean_acc = (((numPredictions-1)*mean_acc) + (prediction == d))/numPredictions;
 
     console.log(numPredictions, mean_acc, prediction);
