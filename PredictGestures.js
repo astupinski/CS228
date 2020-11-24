@@ -14,8 +14,13 @@ var predictedClassLabels = nj.zeros(numSamples);
 var framesOfData = nj.zeros([5,4,6]);
 var numPredictions = 0;
 var mean_acc = 0;
-var overall_acc = nj.zeros(2);
+//var overall_acc = nj.zeros(10);
+var acc_all_digits = 0;
+var totalPredictions = 0;
+var round_num = 1;
 var timeframe = 10;
+var correct_answer = false;
+
 
 var timeSinceLastDigitChange = new Date();
 
@@ -372,17 +377,24 @@ function GotResults(err, result) {
    
     //console.log(parseInt(result.label));
     prediction = parseInt(result.label);
-    numPredictions++;
-    mean_acc = (((numPredictions-1)*mean_acc) + (prediction == digitToShow))/numPredictions;
-
-    if (mean_acc > overall_acc[digitToShow]) {
-	overall_acc[digitToShow] = mean_acc;
-	if (timeframe > 2) {
-	    timeframe = timeframe-3;
-	};
+    if (prediction == digitToShow) {
+	correct_answer = true;
+    } else {
+	correct_answer = false;
     };
+    numPredictions++;
+    totalPredictions++;
+    mean_acc = (((numPredictions-1)*mean_acc) + (prediction == digitToShow))/numPredictions;
+    acc_all_digits = (((totalPredictions-1)*acc_all_digits) + (prediction == digitToShow))/totalPredictions;
 
-    console.log(prediction, mean_acc);
+    //if (mean_acc > overall_acc[digitToShow]) {
+//	overall_acc[digitToShow] = mean_acc;
+//	if (timeframe > 2) {
+//	    timeframe = timeframe-3;
+//	};
+ //   };
+
+    console.log(prediction, "digit score:",mean_acc, "session score:", acc_all_digits);
 
     //console.log(predictedClassLabels.toString());
 
@@ -575,6 +587,7 @@ function HandIsTooClose() {
 function HandleState0(frame) {
     TrainKNNIfNotDoneYet();
     DrawImageToHelpUserPutTheirHandOverTheDevice();
+    timeSinceLastDigitChange = new Date();
 };
 
 function TrainKNNIfNotDoneYet() {
@@ -638,20 +651,25 @@ function DrawArrowAway() {
 function HandleState2(frame) {
     HandleFrame(frame);
     DrawLowerRightPanel();
+    DrawLowerLeftPanel();
     Test();
     DetermineWhetherToDropImage();
     DetermineWhetherToSwitchDigits();
 };
 
+
 function DrawLowerRightPanel() {
     if (digitToShow == 0) {
-	image(signZero, window.innerWidth/2, window.innerHeight/2);
+	//image(signZero, window.innerWidth/2, window.innerHeight/2);
+	text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 1) {
-	image(signOne, window.innerWidth/2, window.innerHeight/2);
+	//image(signOne, window.innerWidth/2, window.innerHeight/2);
+	text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 2) {
-	image(signTwo, window.innerWidth/2, window.innerHeight/2);
+	//image(signTwo, window.innerWidth/2, window.innerHeight/2);
+	text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 3) {
 	image(signThree, window.innerWidth/2, window.innerHeight/2);
@@ -677,16 +695,29 @@ function DrawLowerRightPanel() {
     };
 };
 
+function DrawLowerLeftPanel() {
+    textSize(32);
+    fill(50);
+    if (round_num == 1) {
+	text('Round 1', window.innerWidth/6, 3*window.innerHeight/4);
+    } else if (round_num == 2) {
+	text('Round 2', window.innerWidth/6, 3*window.innerHeight/4);
+    };
+};
+
 
 function DrawNum() {
     if (digitToShow == 0) {
-	image(signZeroNum, window.innerWidth/2, window.innerHeight/2);
+	//image(signZeroNum, window.innerWidth/2, window.innerHeight/2);
+	text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 1) {
-	image(signOneNum, window.innerWidth/2, window.innerHeight/2);
+	//image(signOneNum, window.innerWidth/2, window.innerHeight/2);
+	text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 2) {
-	image(signTwoNum, window.innerWidth/2, window.innerHeight/2);
+	//image(signTwoNum, window.innerWidth/2, window.innerHeight/2);
+	text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 3) {
 	image(signThreeNum, window.innerWidth/2, window.innerHeight/2);
@@ -722,7 +753,8 @@ function DetermineWhetherToDropImage() {
 };
 
 function DetermineWhetherToSwitchDigits() {
-    if (mean_acc > 0.5 && TimeToSwitchDigits() == true) {
+   
+    if (correct_answer == true && TimeToSwitchDigits() == true) {
 	SwitchDigits();
 	numPredictions = 0;
     };
@@ -730,8 +762,10 @@ function DetermineWhetherToSwitchDigits() {
 
 function SwitchDigits() {
     digitToShow++;
-    if (digitToShow == 2) {
+    if (digitToShow == 3) {
 	digitToShow = 0;
+	totalPredictions = 0;
+	round_num++;
     };
     timeSinceLastDigitChange = new Date();
 };
@@ -742,7 +776,7 @@ function TimeToSwitchDigits() {
     var timeInSeconds = timeInMilliseconds / 1000;
     
     if (timeInSeconds > timeframe) {
-	console.log("true");
+	console.log("time to switch");
 	return true;
     } else {
 	return false;
