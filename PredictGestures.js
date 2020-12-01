@@ -18,8 +18,14 @@ var mean_acc = 0;
 var acc_all_digits = 0;
 var totalPredictions = 0;
 var round_num = 1;
-var timeframe = 10;
+var timeframe = 5;
 var correct_answer = false;
+
+var currentUser = "Anne Marie";
+var currentScore = 0;
+var user_scores = {
+    "Anne Marie": 0
+};
 
 
 var timeSinceLastDigitChange = new Date();
@@ -28,10 +34,15 @@ var timeSinceLastDigitChange = new Date();
 function HandleFrame(frame) {
     hand_num = frame.hands.length;
     if (hand_num > 0) {
-	var hand = frame.hands[0];
+	var hand1 = frame.hands[0];
+	var hand2 = frame.hands[1];
 	var ibox = frame.interactionBox;
 	
-	HandleHand(hand, hand_num, ibox);
+	HandleHand(hand1, hand_num, ibox);
+
+	if (hand_num == 2) {
+	    HandleHand(hand2, hand_num, ibox);
+	};
 
 	//Test();
 	//console.log(predictedClassLabels.toString());
@@ -291,10 +302,10 @@ function Train() {
 	
 	
 	knnClassifier.addExample(features0.tolist(), 0);
-	knnClassifier.addExample(features02.tolist(), 0);
-	knnClassifier.addExample(features03.tolist(), 0);
-	knnClassifier.addExample(features04.tolist(), 0);
-	knnClassifier.addExample(features05.tolist(), 0);
+	//knnClassifier.addExample(features02.tolist(), 0);
+	//knnClassifier.addExample(features03.tolist(), 0);
+//	knnClassifier.addExample(features04.tolist(), 0);
+//	knnClassifier.addExample(features05.tolist(), 0);
 	
 	knnClassifier.addExample(features1.tolist(), 1);
 	knnClassifier.addExample(features12.tolist(), 1);
@@ -305,8 +316,8 @@ function Train() {
 	knnClassifier.addExample(features2.tolist(), 2);
 	knnClassifier.addExample(features22.tolist(), 2);
 	knnClassifier.addExample(features23.tolist(), 2);
-	knnClassifier.addExample(features24.tolist(), 2);
-	knnClassifier.addExample(features25.tolist(), 2);
+	//knnClassifier.addExample(features24.tolist(), 2);
+	//knnClassifier.addExample(features25.tolist(), 2);
 	
 	
 	knnClassifier.addExample(features3.tolist(), 3);
@@ -330,8 +341,8 @@ function Train() {
 	knnClassifier.addExample(features6.tolist(), 6);
 	knnClassifier.addExample(features62.tolist(), 6);
 	knnClassifier.addExample(features63.tolist(), 6);
-	knnClassifier.addExample(features64.tolist(), 6);
-	knnClassifier.addExample(features65.tolist(), 6);
+	//knnClassifier.addExample(features64.tolist(), 6);
+	//knnClassifier.addExample(features65.tolist(), 6);
 	
 	knnClassifier.addExample(features7.tolist(), 7);
 	knnClassifier.addExample(features72.tolist(), 7);
@@ -364,6 +375,7 @@ function Test() {
     CenterXData();
     CenterYData();
     CenterZData();
+   // MirrorHand();
     
     currentFeatures = currentFeatures.reshape(1,120);
     knnClassifier.classify(currentFeatures.tolist(), GotResults);
@@ -604,7 +616,9 @@ function DrawImageToHelpUserPutTheirHandOverTheDevice() {
 
 function HandleState1(frame) {
     HandleFrame(frame);
-    if ( HandIsTooFarToTheLeft() ) {
+    if (hand_num == 2) {
+	image(twoHandsMenu, window.innerWidth/2, 0);
+    } else if ( HandIsTooFarToTheLeft() ) {
 	DrawArrowRight();
 	
     } else if (HandIsTooFarToTheRight() ) {
@@ -650,26 +664,31 @@ function DrawArrowAway() {
 
 function HandleState2(frame) {
     HandleFrame(frame);
-    DrawLowerRightPanel();
     DrawLowerLeftPanel();
-    Test();
-    DetermineWhetherToDropImage();
-    DetermineWhetherToSwitchDigits();
+    if (hand_num == 1) {
+	DrawLowerRightPanel();
+	Test();
+	DetermineWhetherToDropImage();
+	DetermineWhetherToSwitchDigits();
+    } else if (hand_num == 2) {
+	digitToShow = 0;
+	totalPredictions = 0;
+    };
 };
 
 
 function DrawLowerRightPanel() {
     if (digitToShow == 0) {
-	//image(signZero, window.innerWidth/2, window.innerHeight/2);
-	text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signZero, window.innerWidth/2, window.innerHeight/2);
+	//text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 1) {
-	//image(signOne, window.innerWidth/2, window.innerHeight/2);
-	text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signOne, window.innerWidth/2, window.innerHeight/2);
+	//text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 2) {
-	//image(signTwo, window.innerWidth/2, window.innerHeight/2);
-	text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signTwo, window.innerWidth/2, window.innerHeight/2);
+	//text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 3) {
 	image(signThree, window.innerWidth/2, window.innerHeight/2);
@@ -696,28 +715,44 @@ function DrawLowerRightPanel() {
 };
 
 function DrawLowerLeftPanel() {
-    textSize(32);
-    fill(50);
-    if (round_num == 1) {
-	text('Round 1', window.innerWidth/6, 3*window.innerHeight/4);
-    } else if (round_num == 2) {
-	text('Round 2', window.innerWidth/6, 3*window.innerHeight/4);
+    textSize(20);
+    stroke('white');
+    //fill(50);
+    var prevBestScore =  user_scores[currentUser];
+    text("current user: "+currentUser,0, 2.3*window.innerHeight/4);
+    text("current score: "+Math.round(currentScore*100),0, 2.5*window.innerHeight/4);
+    text("previous high-score: "+Math.round(prevBestScore*100),0, 2.7*window.innerHeight/4);
+    
+    stroke('black');
+    line(0,3*window.innerHeight/4, window.innerWidth/2,3*window.innerHeight/4);
+
+    stroke('white');
+    text("leaderboard: ",0, 3.2*window.innerHeight/4);
+    
+   
+    c=0.2;
+    
+    for (var key in user_scores) {
+	text(key+"\t"+round(user_scores[key]*100), 0, (3.2+c)*window.innerHeight/4);
+	c += 0.2;
     };
+
+    
 };
 
 
 function DrawNum() {
     if (digitToShow == 0) {
-	//image(signZeroNum, window.innerWidth/2, window.innerHeight/2);
-	text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signZeroNum, window.innerWidth/2, window.innerHeight/2);
+	//text('4 x 0 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 1) {
-	//image(signOneNum, window.innerWidth/2, window.innerHeight/2);
-	text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signOneNum, window.innerWidth/2, window.innerHeight/2);
+	//text('7 - 6 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 2) {
-	//image(signTwoNum, window.innerWidth/2, window.innerHeight/2);
-	text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
+	image(signTwoNum, window.innerWidth/2, window.innerHeight/2);
+	//text('1 + 1 = ?', 3*window.innerWidth/4, 3*window.innerHeight/4);
 	
     } else if (digitToShow == 3) {
 	image(signThreeNum, window.innerWidth/2, window.innerHeight/2);
@@ -762,13 +797,30 @@ function DetermineWhetherToSwitchDigits() {
 
 function SwitchDigits() {
     digitToShow++;
-    if (digitToShow == 3) {
+    currentScore = acc_all_digits;
+  
+    if (digitToShow == 10) {
+	if (user_scores[currentUser] < currentScore) {
+	    user_scores[currentUser] = currentScore;
+	};
+	console.log(user_scores);
+	//createStringDict(user_scores).saveTable('/Users/astupins/CS228/highscores.csv');
 	digitToShow = 0;
 	totalPredictions = 0;
 	round_num++;
+	
     };
     timeSinceLastDigitChange = new Date();
 };
+
+function SaveAsCSV() {
+    let highscores = new p5.Table();
+    let newRow = highscores.addRow();
+    highscores.addColumn("user");
+    highscores.addColumn("score");
+    newRow.setString("user", currentUser);
+};
+
 
 function TimeToSwitchDigits() {
     var currentTime = new Date();
@@ -787,7 +839,7 @@ function TimeToSwitchDigits() {
 function SignIn() {
 
     username = document.getElementById('username').value;
-    console.log(username);
+    //console.log(username);
     
     var list = document.getElementById('users');
     
@@ -796,14 +848,18 @@ function SignIn() {
 	
 	CreateNewUser(username, list);
 	CreateSignInItem(username, list);
+	user_scores[username] = [];
+	console.log(user_scores);
     } else {
 	ID = String(username) + "_signins";
 	listItem = document.getElementById( ID );
 	listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
     };
 
-    console.log(list.innerHTML);
-
+    currentUser = username;
+    currentScore = 0;
+    digitToShow = 0;
+    console.log("Current User:", currentUser);
     return false;
     
 };
@@ -818,8 +874,8 @@ function IsNewUser(username, list) {
 	    usernameFound = true;
 	   
 	};
-	console.log(users[i]);
-	console.log(users[i].innerHTML);
+	//console.log(users[i]);
+	//console.log(users[i].innerHTML);
     };
     return usernameFound;
 };
@@ -847,12 +903,15 @@ Leap.loop(controllerOptions, function(frame) {
     
     if (programState==0) {
 	HandleState0(frame);
+	DrawLowerLeftPanel();
 	
     } else if (programState==1) {
 	HandleState1(frame);
+	DrawLowerLeftPanel();
 	
     } else if (programState==2) {
 	HandleState2(frame);
+	DrawLowerLeftPanel();
     };
  
     

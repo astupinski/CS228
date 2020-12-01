@@ -28,6 +28,8 @@ var signSevenNum;
 var signEightNum;
 var signNineNum;
 
+var twoHandsMenu;
+
 
 function setup() { 
     createCanvas(window.innerWidth,window.innerHeight);
@@ -61,6 +63,8 @@ function setup() {
     signSevenNum = loadImage('https://i.imgur.com/flzOk7d.png');
     signEightNum = loadImage('https://i.imgur.com/VHo0wFQ.png');
     signNineNum = loadImage('https://i.imgur.com/VV8ZrNQ.png');
+
+    twoHandsMenu = loadImage('https://i.imgur.com/7wF5UVa.png');
 
     
 }
